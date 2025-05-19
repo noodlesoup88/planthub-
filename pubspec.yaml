@@ -57,8 +57,8 @@ flutter:
   # the material Icons class.
   uses-material-design: true
   assets: 
-    - C:\Users\Prof.Katana\Desktop\USIU\dart\planthub\plantonhand
-    - C:\Users\Prof.Katana\Desktop\USIU\dart\planthub\pexels
+    - assets/images/plantonhand.png
+    - assets/images/pexels.png
   # To add assets to your application, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg
