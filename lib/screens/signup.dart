@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:planthub/screens/login_page.dart';
 import 'package:planthub/screens/homepage.dart';
-import 'package:planthub/screens/resetpass.dart';
-import 'package:planthub/screens/signup.dart';
 
-class LoginPage extends StatelessWidget {
-  const LoginPage({super.key});
+class Signup extends StatelessWidget {
+  const Signup({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.green[300],
       appBar: AppBar(
-        title: const Text('Login Page'),
+        title: const Text('Signup Page'),
         backgroundColor: Colors.green[300],
         elevation: 0,
       ),
@@ -25,7 +24,7 @@ class LoginPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   const Text(
-                    'Sign into your account',
+                    'Create a new account',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 24,
@@ -54,25 +53,70 @@ class LoginPage extends StatelessWidget {
                         const TextField(
                           keyboardType: TextInputType.name,
                           decoration: InputDecoration(
-                            labelText: "Username",
+                            labelText: "First Name",
                             border: OutlineInputBorder(),
-                            contentPadding: EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 12,
-                            ),
+                            contentPadding:
+                                EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                           ),
                         ),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 16),
                         const TextField(
-                          keyboardType: TextInputType.text,
+                          keyboardType: TextInputType.name,
+                          decoration: InputDecoration(
+                            labelText: "Last Name",
+                            border: OutlineInputBorder(),
+                            contentPadding:
+                                EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        const TextField(
+                          keyboardType: TextInputType.name,
+                          decoration: InputDecoration(
+                            labelText: "Username",
+                            border: OutlineInputBorder(),
+                            contentPadding:
+                                EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        const TextField(
+                          keyboardType: TextInputType.emailAddress,
+                          decoration: InputDecoration(
+                            labelText: "Email",
+                            border: OutlineInputBorder(),
+                            contentPadding:
+                                EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        const TextField(
+                          keyboardType: TextInputType.phone,
+                          decoration: InputDecoration(
+                            labelText: "Phone Number",
+                            border: OutlineInputBorder(),
+                            contentPadding:
+                                EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        const TextField(
                           obscureText: true,
                           decoration: InputDecoration(
                             labelText: "Password",
                             border: OutlineInputBorder(),
-                            contentPadding: EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 12,
-                            ),
+                            contentPadding:
+                                EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        const TextField(
+                          obscureText: true,
+                          decoration: InputDecoration(
+                            labelText: "Confirm Password",
+                            border: OutlineInputBorder(),
+                            contentPadding:
+                                EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                           ),
                         ),
                         const SizedBox(height: 24),
@@ -81,7 +125,8 @@ class LoginPage extends StatelessWidget {
                           height: 50,
                           child: ElevatedButton(
                             onPressed: () {
-                              Navigator.push(
+
+                              Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(builder: (context) => Homepage()),
                               );
@@ -94,7 +139,7 @@ class LoginPage extends StatelessWidget {
                               ),
                             ),
                             child: const Text(
-                              'Login',
+                              'Create Account',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -108,21 +153,18 @@ class LoginPage extends StatelessWidget {
                   const SizedBox(height: 24),
                   TextButton(
                     onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const Signup()),
-                      );
+                      Navigator.pop(context);
                     },
                     child: RichText(
                       text: const TextSpan(
-                        text: 'Are you new? ',
+                        text: 'Already have an account? ',
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 16,
                         ),
                         children: [
                           TextSpan(
-                            text: 'Sign up here',
+                            text: 'Login here',
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 16,
@@ -133,36 +175,7 @@ class LoginPage extends StatelessWidget {
                         ],
                       ),
                     ),
-                  ), 
-                  const SizedBox(height: 50),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const Resetpass()), 
-                      );
-                    }, // 
-                    child: RichText(
-                      text: const TextSpan( 
-                        text: 'Forgot password? ',
-                        style: TextStyle(
-                          color: Colors.black, 
-                          fontSize: 16,
-                        ),
-                        children: [
-                          TextSpan(
-                            text: 'Click here!',
-                            style: TextStyle(
-                              color: Colors.black, 
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              decoration: TextDecoration.underline,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ), 
+                  ),
                   const SizedBox(height: 24),
                 ],
               ),

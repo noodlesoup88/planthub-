@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:planthub/screens/homepage.dart';
-import 'package:planthub/screens/resetpass.dart';
-import 'package:planthub/screens/signup.dart';
+import 'package:planthub/screens/login_page.dart';
 
-class LoginPage extends StatelessWidget {
-  const LoginPage({super.key});
+class Resetpass extends StatelessWidget {
+  const Resetpass({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.green[300],
       appBar: AppBar(
-        title: const Text('Login Page'),
+        title: const Text('Reset Password'),
         backgroundColor: Colors.green[300],
         elevation: 0,
       ),
@@ -25,7 +24,7 @@ class LoginPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   const Text(
-                    'Sign into your account',
+                    'Enter new password',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 24,
@@ -52,9 +51,10 @@ class LoginPage extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         const TextField(
-                          keyboardType: TextInputType.name,
+                          keyboardType: TextInputType.text,
+                          obscureText: true,
                           decoration: InputDecoration(
-                            labelText: "Username",
+                            labelText: "New password",
                             border: OutlineInputBorder(),
                             contentPadding: EdgeInsets.symmetric(
                               horizontal: 16,
@@ -67,7 +67,7 @@ class LoginPage extends StatelessWidget {
                           keyboardType: TextInputType.text,
                           obscureText: true,
                           decoration: InputDecoration(
-                            labelText: "Password",
+                            labelText: "Confirm new password",
                             border: OutlineInputBorder(),
                             contentPadding: EdgeInsets.symmetric(
                               horizontal: 16,
@@ -81,10 +81,21 @@ class LoginPage extends StatelessWidget {
                           height: 50,
                           child: ElevatedButton(
                             onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => Homepage()),
+                          
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Password reset successful!'), 
+                                  duration: Duration(seconds: 2),
+                                ),
                               );
+                              
+                              
+                              Future.delayed(const Duration(seconds: 2), () {
+                                Navigator.pushReplacement( 
+                                  context,
+                                  MaterialPageRoute(builder: (context) => const LoginPage()),
+                                );
+                              });
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.green[600],
@@ -94,7 +105,7 @@ class LoginPage extends StatelessWidget {
                               ),
                             ),
                             child: const Text(
-                              'Login',
+                              'Reset Password',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -105,64 +116,6 @@ class LoginPage extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 24),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const Signup()),
-                      );
-                    },
-                    child: RichText(
-                      text: const TextSpan(
-                        text: 'Are you new? ',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                        ),
-                        children: [
-                          TextSpan(
-                            text: 'Sign up here',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              decoration: TextDecoration.underline,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ), 
-                  const SizedBox(height: 50),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const Resetpass()), 
-                      );
-                    }, // 
-                    child: RichText(
-                      text: const TextSpan( 
-                        text: 'Forgot password? ',
-                        style: TextStyle(
-                          color: Colors.black, 
-                          fontSize: 16,
-                        ),
-                        children: [
-                          TextSpan(
-                            text: 'Click here!',
-                            style: TextStyle(
-                              color: Colors.black, 
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              decoration: TextDecoration.underline,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ), 
                   const SizedBox(height: 24),
                 ],
               ),
