@@ -10,10 +10,9 @@ class Homepage extends StatelessWidget {
         backgroundColor: Colors.green[300],
         elevation: 0,
       ),
-      
+      backgroundColor: Colors.green[100],
       body: Column(
         children: [
-          // Your existing welcome section
           Container(
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
@@ -47,7 +46,6 @@ class Homepage extends StatelessWidget {
             ),
           ),
           
-          
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(16),
@@ -55,14 +53,18 @@ class Homepage extends StatelessWidget {
                 children: [
                   const SizedBox(height: 20),
                   
-                  
                   Container(
                     height: 150,
                     width: double.infinity,
                     margin: const EdgeInsets.only(bottom: 16),
                     decoration: BoxDecoration(
-                      color: Colors.green[100],
+                      color: Colors.blue[100],
                       borderRadius: BorderRadius.circular(12),
+                      //image: DecorationImage(
+                      //image: AssetImage('assets/images/plants.jpg'),
+                      //  fit: BoxFit.cover,
+                        //opacity: 0.7, 
+                      //),
                     ),
                     child: const Center(
                       child: Column(
@@ -71,7 +73,7 @@ class Homepage extends StatelessWidget {
                           Icon(
                             Icons.visibility,
                             size: 40,
-                            color: Colors.green,
+                            color: Colors.blue,
                           ),
                           SizedBox(height: 8),
                           Text(
@@ -87,13 +89,17 @@ class Homepage extends StatelessWidget {
                     ),
                   ),
                   
-                 
                   Container(
                     height: 150,
                     width: double.infinity,
                     decoration: BoxDecoration(
                       color: Colors.blue[100],
                       borderRadius: BorderRadius.circular(12),
+                      //image: DecorationImage(
+                      //image: AssetImage('assets/images/learn.jpg'),
+                        //fit: BoxFit.cover,
+                        //opacity: 0.7, 
+                      //),
                     ),
                     child: const Center(
                       child: Column(
@@ -110,17 +116,162 @@ class Homepage extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
-                              color: Colors.blue,
+                              color: Colors.green,
                             ),
                           ),
                         ],
                       ),
                     ),
                   ),
-                  
+                
+                  // categories of plants
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Categories',
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            // Indoor 
+                            Expanded(
+                              child: Container(
+                                margin: const EdgeInsets.symmetric(horizontal: 4),
+                                padding: const EdgeInsets.symmetric(vertical: 20),
+                                decoration: BoxDecoration(
+                                  color: Colors.green[50],
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(color: Colors.green[200]!),
+                                ),
+                                child: Column(
+                                  children: [
+                                    Image.asset(
+                                      'assets/images/plant.png', 
+                                      width: 40,
+                                      height: 40,
+                                    ),
+                                    const SizedBox(height: 8),
+                                    const Text(
+                                      'Indoor',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.green,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            
+                            // outdoor
+                            Expanded(
+                              child: Container(
+                                margin: const EdgeInsets.symmetric(horizontal: 4),
+                                padding: const EdgeInsets.symmetric(vertical: 20),
+                                decoration: BoxDecoration(
+                                  color: Colors.blue[50],
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(color: Colors.blue[200]!),
+                                ),
+                                child: Column(
+                                  children: [
+                                    Image.asset(
+                                      'assets/images/seedling.png', 
+                                      width: 40,
+                                      height: 40,
+                                    ),
+                                    const SizedBox(height: 8),
+                                    const Text(
+                                      'Outdoor',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.blue,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            
+                            // Seedlings Category
+                            Expanded(
+                              child: Container(
+                                margin: const EdgeInsets.symmetric(horizontal: 4),
+                                padding: const EdgeInsets.symmetric(vertical: 20),
+                                decoration: BoxDecoration(
+                                  color: Colors.orange[50],
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(color: Colors.orange[200]!),
+                                ),
+                                child: Column(
+                                  children: [
+                                    Image.asset(
+                                      'assets/images/watering-plants.png', 
+                                      width: 40,
+                                      height: 40,
+                                    ),
+                                    const SizedBox(height: 8),
+                                    const Text(
+                                      'Seedlings',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.orange,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),  
                 ],
               ),
             ),
+          ),
+        ],
+      ),
+      
+      
+      bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        selectedItemColor: Colors.green,
+        unselectedItemColor: Colors.grey,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home, color: Colors.black,),
+            label: 'Home',
+            
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.explore, color: Colors.black,),
+            label: 'Explore',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.shopping_cart, color: Colors.black,),
+            label: 'Cart',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.bookmark, color: Colors.black,),
+            label: 'Bookmark',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings, color: Colors.black,), 
+            label: 'Settings',
           ),
         ],
       ),

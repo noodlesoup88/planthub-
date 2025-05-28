@@ -59,6 +59,11 @@ flutter:
   assets: 
     - assets/images/plantonhand.png
     - assets/images/pexels.png
+    - assets/images/plant.png
+    - assets/images/seedling.png
+    - assets/images/watering-plants.png
+    - assets/images/learn.jpg
+    - assets/images/plants.jpg
   # To add assets to your application, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg
