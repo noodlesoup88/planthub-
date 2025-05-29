@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:planthub/screens/explore.dart';
+import 'package:planthub/screens/cart.dart';
+import 'package:planthub/screens/bookmark.dart';
+import 'package:planthub/screens/settings.dart';
+
 
 class Homepage extends StatelessWidget {
   const Homepage({super.key});
 
   @override
+  
+  
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -247,34 +254,44 @@ class Homepage extends StatelessWidget {
       ),
       
       
+      
+      //  type: BottomNavigationBarType.fixed,
+        //selectedItemColor: Colors.green,
+      //  unselectedItemColor: Colors.grey,
       bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: Colors.green,
-        unselectedItemColor: Colors.grey,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home, color: Colors.black,),
-            label: 'Home',
-            
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.explore, color: Colors.black,),
-            label: 'Explore',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_cart, color: Colors.black,),
-            label: 'Cart',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.bookmark, color: Colors.black,),
-            label: 'Bookmark',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings, color: Colors.black,), 
-            label: 'Settings',
-          ),
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.explore), label: 'Explore'),
+          BottomNavigationBarItem(icon: Icon(Icons.shopping_cart), label: 'Cart'),
+          BottomNavigationBarItem(icon: Icon(Icons.bookmark), label: 'Bookmark'),
+          BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Settings'),
         ],
-      ),
+        currentIndex: 0,
+        onTap: (index) {
+          switch (index) {
+            case 0:
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Homepage()));
+              break;
+            case 1:
+              Navigator.push(context, MaterialPageRoute(builder: (context) => Explore()));
+              break;
+            case 2:
+              Navigator.push(context, MaterialPageRoute(builder: (context) => Cart()));
+              break;
+            case 3:
+              Navigator.push(context, MaterialPageRoute(builder: (context) => Bookmark()));
+              break;
+            case 4:
+              Navigator.push(context, MaterialPageRoute(builder: (context) => Settings()));
+              break;
+          }
+        },
+        backgroundColor: Colors.white,
+        selectedItemColor: Colors.black,
+        unselectedItemColor: Colors.grey[600],
+      ),    
+        
+    
     );
   }
 }
