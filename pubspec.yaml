@@ -66,6 +66,8 @@ flutter:
     - assets/images/watering-plants.png
     - assets/images/learn.jpg
     - assets/images/plants.jpg
+    - assets/images/africanguy.jpg
+    - assets/images/gardening.png
   # To add assets to your application, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg

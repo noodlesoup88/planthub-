@@ -4,36 +4,62 @@ import 'package:planthub/screens/cart.dart';
 import 'package:planthub/screens/bookmark.dart';
 import 'package:planthub/screens/settings.dart';
 
-class Explore extends StatelessWidget {
-  const Explore({super.key});
+// UPDATED: Added optional parameter to start on specific tab
+class Explore extends StatefulWidget {
+  final int initialTabIndex;
+  
+  const Explore({super.key, this.initialTabIndex = 0});
+
+  @override
+  State<Explore> createState() => _ExploreState();
+}
+
+class _ExploreState extends State<Explore> with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(
+      length: 3,
+      vsync: this,
+      initialIndex: widget.initialTabIndex,
+    );
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 3, 
-      child: Scaffold(
-        backgroundColor: Colors.green[100],
-        appBar: AppBar(
-          title: const Text('Explore Plants'),
-          backgroundColor: Colors.green[300],
-          
-          bottom: const TabBar(
-            tabs: [
-              Tab(text: 'Discover'),
-              Tab(text: 'Categories'), 
-              Tab(text: 'Fresh Picks'),
-            ],
-          ),
-        ),
-        body: const TabBarView(
-          children: [
-            DiscoverTab(),
-            CategoriesTab(),
-            FreshPicksTab(),
+    return Scaffold(
+      backgroundColor: Colors.green[100],
+      appBar: AppBar(
+        title: const Text('Explore Plants'),
+        backgroundColor: Colors.green[300],
+        
+        bottom: TabBar(
+          controller: _tabController,
+          tabs: const [
+            Tab(text: 'Discover'),
+            Tab(text: 'Categories'), 
+            Tab(text: 'Fresh Picks'),
           ],
         ),
+      ),
+      body: TabBarView(
+        controller: _tabController,
+        children: const [
+          DiscoverTab(),
+          CategoriesTab(),
+          FreshPicksTab(),
+        ],
+      ),
 
-        bottomNavigationBar: BottomNavigationBar(
+      bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.explore), label: 'Explore'),
@@ -45,7 +71,7 @@ class Explore extends StatelessWidget {
         onTap: (index) {
           switch (index) {
             case 0:
-              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Homepage()));
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Homepage()));
               break;
             case 1:
               Navigator.push(context, MaterialPageRoute(builder: (context) => const Explore()));
@@ -64,7 +90,6 @@ class Explore extends StatelessWidget {
         backgroundColor: Colors.white,
         selectedItemColor: Colors.black,
         unselectedItemColor: Colors.grey[600],
-      ),
       ),
     );
   }
@@ -127,7 +152,6 @@ class CategoriesTab extends StatelessWidget {
         crossAxisSpacing: 16,
         mainAxisSpacing: 16,
         children: [
-          
           _buildCategoryItem('🌸', 'Flowers'),
           _buildCategoryItem('🌳', 'Trees'),
           _buildCategoryItem('🪴', 'Indoor Plants'),
