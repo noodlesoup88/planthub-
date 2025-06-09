@@ -1,10 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:planthub/screens/homepage.dart';
 import 'package:planthub/screens/resetpass.dart';
 import 'package:planthub/screens/signup.dart';
+import 'package:planthub/controllers/auth_controller.dart';
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  
+  // Create instance of controller
+  final AuthController _authController = AuthController();
+  
+  bool _isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -51,9 +64,11 @@ class LoginPage extends StatelessWidget {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const TextField(
+                        // Username field (no change needed - already using username)
+                        TextField(
+                          controller: _usernameController,
                           keyboardType: TextInputType.name,
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             labelText: "Username",
                             border: OutlineInputBorder(),
                             contentPadding: EdgeInsets.symmetric(
@@ -63,10 +78,11 @@ class LoginPage extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 20),
-                        const TextField(
+                        TextField(
+                          controller: _passwordController,
                           keyboardType: TextInputType.text,
                           obscureText: true,
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             labelText: "Password",
                             border: OutlineInputBorder(),
                             contentPadding: EdgeInsets.symmetric(
@@ -80,12 +96,7 @@ class LoginPage extends StatelessWidget {
                           width: double.infinity,
                           height: 50,
                           child: ElevatedButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => Homepage()),
-                              );
-                            },
+                            onPressed: _isLoading ? null : _handleLogin,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.green[600],
                               foregroundColor: Colors.white,
@@ -93,13 +104,15 @@ class LoginPage extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(12),
                               ),
                             ),
-                            child: const Text(
-                              'Login',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
+                            child: _isLoading
+                                ? const CircularProgressIndicator(color: Colors.white)
+                                : const Text(
+                                    'Login',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                           ),
                         ),
                       ],
@@ -141,7 +154,7 @@ class LoginPage extends StatelessWidget {
                         context,
                         MaterialPageRoute(builder: (context) => const Resetpass()), 
                       );
-                    }, // 
+                    },
                     child: RichText(
                       text: const TextSpan( 
                         text: 'Forgot password? ',
@@ -171,5 +184,46 @@ class LoginPage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  // login handler
+  void _handleLogin() async {
+    
+    if (_usernameController.text.isEmpty) {
+      _showMessage('Please enter your username');
+      return;
+    }
+    
+    if (_passwordController.text.isEmpty) {
+      _showMessage('Please enter your password');
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    await _authController.handleLogin(
+      context: context,
+      username: _usernameController.text.trim(),
+      password: _passwordController.text,
+    );
+
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  void _showMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _passwordController.dispose();
+    super.dispose();
   }
 }

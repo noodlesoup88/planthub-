@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import '../services/auth_service.dart';
-import '../models/user_model.dart';
-import 'homepage.dart';
+import 'package:planthub/controllers/auth_controller.dart';
+import 'package:planthub/models/user_model.dart';
 
 class Signup extends StatefulWidget {
   const Signup({super.key});
@@ -21,14 +20,11 @@ class _SignupState extends State<Signup> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
   
-  // Selected role
   String _selectedRole = 'Client';
   
-  // Loading state
   bool _isLoading = false;
   
-  // Auth service
-  final AuthService _authService = AuthService();
+  final AuthController _authController = AuthController();
 
   @override
   Widget build(BuildContext context) {
@@ -227,9 +223,7 @@ class _SignupState extends State<Signup> {
     );
   }
 
-  // Simple signup handler
   void _handleSignup() async {
-    // Basic checks
     if (_firstNameController.text.isEmpty) {
       _showMessage('Please enter your first name');
       return;
@@ -255,11 +249,11 @@ class _SignupState extends State<Signup> {
       _isLoading = true;
     });
 
-    // Convert role to UserType
     UserType userType = _selectedRole == 'Farmer' ? UserType.farmer : UserType.client;
 
-    // Try to sign up
-    String? error = await _authService.signUp(
+    // controller will handle navigation based on user type automatically
+    await _authController.handleSignup(
+      context: context,
       email: _emailController.text.trim(),
       password: _passwordController.text,
       firstName: _firstNameController.text.trim(),
@@ -269,24 +263,12 @@ class _SignupState extends State<Signup> {
       userType: userType,
     );
 
-    // Hide loading
+    
     setState(() {
       _isLoading = false;
     });
-
-    if (error == null) {
-      // Success - go to homepage
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const Homepage()),
-      );
-    } else {
-      // Show error
-      _showMessage('Error: $error');
-    }
   }
 
-  // Simple method to show messages
   void _showMessage(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message)),
