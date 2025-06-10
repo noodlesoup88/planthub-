@@ -4,7 +4,7 @@ import 'package:planthub/screens/cart.dart';
 import 'package:planthub/screens/bookmark.dart';
 import 'package:planthub/screens/settings.dart';
 
-// UPDATED: Added optional parameter to start on specific tab
+
 class Explore extends StatefulWidget {
   final int initialTabIndex;
   
