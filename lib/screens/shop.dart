@@ -1,18 +1,6 @@
 import 'package:flutter/material.dart';
-
-class Plant {
-  final String name;
-  final String category;
-  final double price;
-  final String imageUrl;
-
-  Plant({
-    required this.name,
-    required this.category,
-    required this.price,
-    required this.imageUrl,
-  });
-}
+import '../services/plant_service.dart';
+import '../models/plant_model.dart';
 
 class Shop extends StatefulWidget {
   const Shop({super.key});
@@ -22,83 +10,109 @@ class Shop extends StatefulWidget {
 }
 
 class _ShopState extends State<Shop> {
-  
-  final List<Plant> plants = [
-    Plant(
-      name: 'Rose Bush',
-      category: 'Flowers',
-      price: 50.0,
-      imageUrl: 'https://placeholder.svg?height=100&width=100',
-    ),
-    Plant(
-      name: 'Cactus',
-      category: 'Succulents',
-      price: 35.0,
-      imageUrl: 'https://placeholder.svg?height=100&width=100',
-    ),
-    Plant(
-      name: 'Aloe Vera',
-      category: 'Succulents',
-      price: 25.0,
-      imageUrl: 'https://placeholder.svg?height=100&width=100',
-    ),
-    Plant(
-      name: 'Snake Plant',
-      category: 'Indoor',
-      price: 30.0,
-      imageUrl: 'https://placeholder.svg?height=100&width=100',
-    ),
-  ];
+  final PlantService _plantService = PlantService();
+  List<PlantModel> _plants = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPlants();
+  }
+
+  Future<void> _loadPlants() async {
+    try {
+      setState(() => _isLoading = true);
+      _plants = await _plantService.getAllPlants().first;
+      setState(() => _isLoading = false);
+    } catch (e) {
+      print('Error loading plants: $e');
+      setState(() => _isLoading = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My Plants'),
+        title: const Text('Shop Plants'),
         backgroundColor: Colors.green,
       ),
-      body: plants.isEmpty
-          ? const Center(child: Text('No plants added yet'))
-          : ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: plants.length,
-              itemBuilder: (context, index) {
-                final plant = plants[index];
-                return Card(
-                  margin: const EdgeInsets.only(bottom: 16),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Row(
-                      children: [
-                        // Plant image
-                        Container(
-                          width: 80,
-                          height: 80,
-                          decoration: BoxDecoration(
-                            color: Colors.grey.shade200,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: const Icon(
-                            Icons.local_florist,
-                            size: 40,
-                            color: Colors.green,
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        // Plant details
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                plant.name,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                ),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : _plants.isEmpty
+              ? const Center(child: Text('No plants available'))
+              : ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: _plants.length,
+                  itemBuilder: (context, index) {
+                    final plant = _plants[index];
+                    return Card(
+                      margin: const EdgeInsets.only(bottom: 16),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          children: [
+                            // Plant image
+                            Container(
+                              width: 80,
+                              height: 80,
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade200,
+                                borderRadius: BorderRadius.circular(8),
+                                image: plant.imageUrl.isNotEmpty
+                                    ? DecorationImage(
+                                        image: NetworkImage(plant.imageUrl),
+                                        fit: BoxFit.cover,
+                                      )
+                                    : null,
                               ),
-                              Text(
-                                'Category: ${plant.category}',
+                              child: plant.imageUrl.isEmpty
+                                  ? const Icon(
+                                      Icons.local_florist,
+                                      size: 40,
+                                      color: Colors.green,
+                                    )
+                                  : null,
+                            ),
+                            const SizedBox(width: 16),
+                            // Plant details
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    plant.name,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                  Text(
+                                    '${plant.price.toStringAsFixed(2)} KES',
+                                    style: const TextStyle(
+                                      color: Colors.green,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Text(
+                                    plant.category,
+                                    style: TextStyle(
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+    );
+  }
+}                                'Category: ${plant.category}',
                                 style: TextStyle(color: Colors.grey.shade600),
                               ),
                               Text(

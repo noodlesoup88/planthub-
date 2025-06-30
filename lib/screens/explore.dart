@@ -20,6 +20,8 @@ class Explore extends StatefulWidget {
 class _ExploreState extends State<Explore> with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final PlantService _plantService = PlantService();
+  List<PlantModel> _plants = [];
+  bool _isLoading = true;
 
   @override
   void initState() {
@@ -29,6 +31,18 @@ class _ExploreState extends State<Explore> with SingleTickerProviderStateMixin {
       vsync: this,
       initialIndex: widget.initialTabIndex,
     );
+    _loadPlants();
+  }
+
+  Future<void> _loadPlants() async {
+    try {
+      setState(() => _isLoading = true);
+      _plants = await _plantService.getAllPlants().first;
+      setState(() => _isLoading = false);
+    } catch (e) {
+      print('Error loading plants: $e');
+      setState(() => _isLoading = false);
+    }
   }
 
   @override
@@ -55,7 +69,11 @@ class _ExploreState extends State<Explore> with SingleTickerProviderStateMixin {
       body: TabBarView(
         controller: _tabController,
         children: [
-          DiscoverTab(plantService: _plantService),
+          DiscoverTab(
+            plants: _plants,
+            isLoading: _isLoading,
+            plantService: _plantService,
+          ),
           CategoriesTab(plantService: _plantService),
         ],
       ),
@@ -97,9 +115,16 @@ class _ExploreState extends State<Explore> with SingleTickerProviderStateMixin {
 
 // Simple Discover Tab - shows all plants
 class DiscoverTab extends StatelessWidget {
+  final List<PlantModel> plants;
+  final bool isLoading;
   final PlantService plantService;
   
-  const DiscoverTab({super.key, required this.plantService});
+  const DiscoverTab({
+    super.key,
+    required this.plants,
+    required this.isLoading,
+    required this.plantService,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -114,57 +139,47 @@ class DiscoverTab extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Expanded(
-            child: StreamBuilder<List<PlantModel>>(
-              stream: plantService.getAllPlants(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                
-                if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return const Center(
-                    child: Text('No plants available yet', style: TextStyle(color: Colors.grey)),
-                  );
-                }
-                
-                final plants = snapshot.data!;
-                return ListView.builder(
-                  itemCount: plants.length,
-                  itemBuilder: (context, index) {
-                    final plant = plants[index];
-                    return Card(
-                      margin: const EdgeInsets.only(bottom: 12),
-                      child: ListTile(
-                        leading: ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: Image.network(
-                            plant.imageUrl,
-                            width: 60,
-                            height: 60,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              return Container(
-                                width: 60,
-                                height: 60,
-                                color: Colors.grey[300],
-                                child: const Icon(Icons.local_florist),
-                              );
-                            },
-                          ),
-                        ),
-                        title: Text(plant.name),
-                        subtitle: Text('By ${plant.farmerName}'),
-                        trailing: Text(
-                          '\$${plant.price.toStringAsFixed(2)}',
-                          style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.green),
-                        ),
-                        onTap: () => _showPlantDetail(context, plant),
+            child: isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : plants.isEmpty
+                    ? const Center(
+                        child: Text('No plants available yet', style: TextStyle(color: Colors.grey)),
+                      )
+                    : ListView.builder(
+                        itemCount: plants.length,
+                        itemBuilder: (context, index) {
+                          final plant = plants[index];
+                          return Card(
+                            margin: const EdgeInsets.only(bottom: 12),
+                            child: ListTile(
+                              leading: ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: Image.network(
+                                  plant.imageUrl,
+                                  width: 60,
+                                  height: 60,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Container(
+                                      width: 60,
+                                      height: 60,
+                                      color: Colors.grey[300],
+                                      child: const Icon(Icons.local_florist),
+                                    );
+                                  },
+                                ),
+                              ),
+                              title: Text(plant.name),
+                              subtitle: Text('By ${plant.farmerName}'),
+                              trailing: Text(
+                                'KES ${plant.price.toStringAsFixed(2)}',
+                                style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.green),
+                              ),
+                              onTap: () => _showPlantDetail(context, plant),
+                            ),
+                          );
+                        },
                       ),
-                    );
-                  },
-                );
-              },
-            ),
           ),
         ],
       ),
@@ -173,16 +188,41 @@ class DiscoverTab extends StatelessWidget {
 }
 
 // Simple Categories Tab
-class CategoriesTab extends StatelessWidget {
+class CategoriesTab extends StatefulWidget {
   final PlantService plantService;
-  final List<Map<String, dynamic>> categories = [
+
+  const CategoriesTab({super.key, required this.plantService});
+
+  @override
+  State<CategoriesTab> createState() => _CategoriesTabState();
+}
+
+class _CategoriesTabState extends State<CategoriesTab> {
+  List<PlantModel> _plants = [];
+  bool _isLoading = true;
+  final List<Map<String, dynamic>> _categories = [
     {'emoji': '🌸', 'name': 'Flowers'},
     {'emoji': '🌳', 'name': 'Trees'},
     {'emoji': '🪴', 'name': 'Indoor Plants'},
     {'emoji': '🥬', 'name': 'Vegetables'},
   ];
-  
-  CategoriesTab({super.key, required this.plantService});
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPlants();
+  }
+
+  Future<void> _loadPlants() async {
+    try {
+      setState(() => _isLoading = true);
+      _plants = await widget.plantService.getAllPlants().first;
+      setState(() => _isLoading = false);
+    } catch (e) {
+      print('Error loading plants: $e');
+      setState(() => _isLoading = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -192,28 +232,24 @@ class CategoriesTab extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'Browse by Category',
+            'Categories',
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 16),
-          
-          // Category grid
-          Expanded(
-            child: GridView.builder(
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 16,
-              ),
-              itemCount: categories.length,
-              itemBuilder: (context, index) {
-                return _buildCategoryItem(
-                  context, 
-                  categories[index]['emoji'], 
-                  categories[index]['name']
-                );
-              },
+          GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10,
+              childAspectRatio: 1.5,
             ),
+            itemCount: _categories.length,
+            itemBuilder: (context, index) {
+              final category = _categories[index];
+              return _buildCategoryItem(context, category['emoji'], category['name']);
+            },
           ),
         ],
       ),
@@ -221,18 +257,37 @@ class CategoriesTab extends StatelessWidget {
   }
 
   Widget _buildCategoryItem(BuildContext context, String emoji, String name) {
-    return GestureDetector(
+    return InkWell(
       onTap: () => _showCategoryPlants(context, name),
-      child: Card(
-        elevation: 4,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.2),
+              spreadRadius: 1,
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(emoji, style: const TextStyle(fontSize: 40)),
+            Text(
+              emoji,
+              style: const TextStyle(fontSize: 32),
+            ),
             const SizedBox(height: 8),
             Text(
-              name, 
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              name,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+              textAlign: TextAlign.center,
             ),
           ],
         ),
@@ -240,111 +295,110 @@ class CategoriesTab extends StatelessWidget {
     );
   }
 
-  // Simple category plants popup
   void _showCategoryPlants(BuildContext context, String category) {
+    final filteredPlants = _plants.where((plant) => plant.category == category).toList();
+
     showDialog(
       context: context,
-      builder: (context) => Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        child: Container(
-          width: double.infinity,
-          height: MediaQuery.of(context).size.height * 0.7,
-          padding: const EdgeInsets.all(16),
+      builder: (context) => AlertDialog(
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              category,
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            IconButton(
+              icon: const Icon(Icons.close),
+              onPressed: () => Navigator.pop(context),
+            ),
+          ],
+        ),
+        content: Container(
+          width: double.maxFinite,
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    category,
-                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.close),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                ],
+              const Text(
+                'Available Plants',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 16),
               
               // Plants grid
               Expanded(
-                child: StreamBuilder<List<PlantModel>>(
-                  stream: plantService.getPlantsByCategory(category),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-                    
-                    if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                      return Center(
-                        child: Text('No $category available yet', style: TextStyle(color: Colors.grey)),
-                      );
-                    }
-                    
-                    final plants = snapshot.data!;
-                    return GridView.builder(
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 10,
-                        mainAxisSpacing: 10,
-                        childAspectRatio: 0.8,
-                      ),
-                      itemCount: plants.length,
-                      itemBuilder: (context, index) {
-                        final plant = plants[index];
-                        return GestureDetector(
-                          onTap: () {
-                            Navigator.pop(context); // Close category popup
-                            _showPlantDetail(context, plant);
-                          },
-                          child: Card(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Expanded(
-                                  child: ClipRRect(
-                                    borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
-                                    child: Image.network(
-                                      plant.imageUrl,
-                                      width: double.infinity,
-                                      fit: BoxFit.cover,
-                                      errorBuilder: (context, error, stackTrace) {
-                                        return Container(
-                                          color: Colors.grey[300],
-                                          child: const Icon(Icons.local_florist, size: 40),
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.all(8),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        plant.name,
-                                        style: const TextStyle(fontWeight: FontWeight.bold),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                      Text(
-                                        '\$${plant.price.toStringAsFixed(2)}',
-                                        style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
+                child: _isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : filteredPlants.isEmpty
+                        ? Center(
+                            child: Text('No $category available yet', style: TextStyle(color: Colors.grey)),
+                          )
+                        : GridView.builder(
+                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 10,
+                              mainAxisSpacing: 10,
+                              childAspectRatio: 1.5,
                             ),
+                            itemCount: filteredPlants.length,
+                            itemBuilder: (context, index) {
+                              final plant = filteredPlants[index];
+                              return Card(
+                                margin: const EdgeInsets.all(5),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Expanded(
+                                      child: ClipRRect(
+                                        borderRadius: const BorderRadius.vertical(
+                                          top: Radius.circular(4),
+                                        ),
+                                        child: Image.network(
+                                          plant.imageUrl,
+                                          fit: BoxFit.cover,
+                                          errorBuilder: (context, error, stackTrace) {
+                                            return Container(
+                                              color: Colors.grey[300],
+                                              child: const Icon(Icons.local_florist),
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            plant.name,
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          Text(
+                                            'KES ${plant.price.toStringAsFixed(2)}',
+                                            style: const TextStyle(
+                                              color: Colors.green,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          Text(
+                                            'By ${plant.farmerName}',
+                                            style: TextStyle(
+                                              color: Colors.grey[600],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
                           ),
-                        );
-                      },
-                    );
-                  },
-                ),
               ),
             ],
           ),

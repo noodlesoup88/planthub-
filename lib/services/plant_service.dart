@@ -51,7 +51,6 @@ class PlantService {
     return _firestore
         .collection('plants')
         .where('category', isEqualTo: category)
-        .orderBy('createdAt', descending: true)
         .snapshots()
         .map((snapshot) => snapshot.docs
             .map((doc) => PlantModel.fromFirestore(doc))
