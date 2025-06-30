@@ -10,6 +10,19 @@ class BookmarkService {
     required PlantModel plant,
   }) async {
     try {
+      // Check if bookmark already exists
+      final existingBookmark = await _firestore
+          .collection('bookmarks')
+          .where('userId', isEqualTo: userId)
+          .where('plantId', isEqualTo: plant.id)
+          .get();
+
+      if (existingBookmark.docs.isNotEmpty) {
+        // Bookmark already exists
+        return false;
+      }
+
+      // Add new bookmark
       await _firestore.collection('bookmarks').add({
         'userId': userId,
         'plantId': plant.id,

@@ -5,6 +5,8 @@ import 'package:planthub/screens/bookmark.dart';
 import 'package:planthub/screens/settings.dart';
 import '../services/plant_service.dart';
 import '../services/auth_service.dart';
+import '../services/bookmark_service.dart';
+import '../services/cart_service.dart';
 import '../models/plant_model.dart';
 import '../models/user_model.dart';
 
@@ -542,35 +544,76 @@ void _showPlantDetail(BuildContext context, PlantModel plant) {
   );
 }
 
+final BookmarkService _bookmarkService = BookmarkService();
+final CartService _cartService = CartService();
+
 // Simple helper functions
-void _addToBookmarks(BuildContext context, PlantModel plant) {
-  // Get current user and add to bookmarks
-  AuthService().getCurrentUser().then((user) {
+void _addToBookmarks(BuildContext context, PlantModel plant) async {
+  try {
+    // Get current user
+    final user = await AuthService().getCurrentUser();
     if (user != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Added to bookmarks!')),
+      // Add to bookmarks
+      final success = await _bookmarkService.addBookmark(
+        userId: user.uid,
+        plant: plant,
       );
+      
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Added to bookmarks!')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Already in bookmarks')),
+        );
+      }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please log in to bookmark plants')),
       );
     }
-  });
-  Navigator.pop(context);
+  } catch (e) {
+    print('Error in addToBookmarks: $e');
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Error adding to bookmarks')),
+    );
+  } finally {
+    Navigator.pop(context);
+  }
 }
 
-void _addToCart(BuildContext context, PlantModel plant) {
-  // Get current user and add to cart
-  AuthService().getCurrentUser().then((user) {
+void _addToCart(BuildContext context, PlantModel plant) async {
+  try {
+    // Get current user
+    final user = await AuthService().getCurrentUser();
     if (user != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Added to cart!')),
+      // Add to cart
+      final success = await _cartService.addToCart(
+        userId: user.uid,
+        plant: plant,
       );
+      
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Added to cart!')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Already in cart')),
+        );
+      }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please log in to add to cart')),
       );
     }
-  });
-  Navigator.pop(context);
+  } catch (e) {
+    print('Error in addToCart: $e');
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Error adding to cart')),
+    );
+  } finally {
+    Navigator.pop(context);
+  }
 }

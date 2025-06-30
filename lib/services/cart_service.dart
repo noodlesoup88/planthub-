@@ -10,6 +10,19 @@ class CartService {
     required PlantModel plant,
   }) async {
     try {
+      // Check if item already exists in cart
+      final existingItem = await _firestore
+          .collection('cart')
+          .where('userId', isEqualTo: userId)
+          .where('plantId', isEqualTo: plant.id)
+          .get();
+
+      if (existingItem.docs.isNotEmpty) {
+        // Item already in cart
+        return false;
+      }
+
+      // Add new item to cart
       await _firestore.collection('cart').add({
         'userId': userId,
         'plantId': plant.id,
